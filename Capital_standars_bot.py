@@ -1,9 +1,10 @@
-from telegram import Update, ReplyKeyboardMarkup
-from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, ContextTypes, ConversationHandler, filters
+import os
 import json
+from telegram import Update, ReplyKeyboardMarkup
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 
 CHOOSE_BANK = 0
-TOKEN = os.getenv('BOT_TOKEN') 
+TOKEN = os.getenv('BOT_TOKEN')  # Теперь os импортирован!
 
 # Загружаем конфиг банков
 with open('banks_config.json', encoding='utf-8') as f:
@@ -35,7 +36,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
    return ConversationHandler.END
 
 def main():
-   app = ApplicationBuilder().token(TOKEN).build()
+   app = Application.builder().token(TOKEN).build()
 
    conv_handler = ConversationHandler(
        entry_points=[CommandHandler('start', start)],
@@ -50,5 +51,4 @@ def main():
    app.run_polling()
 
 if __name__ == '__main__':
-
    main()
