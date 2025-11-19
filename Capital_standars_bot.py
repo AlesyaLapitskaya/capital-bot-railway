@@ -1,48 +1,59 @@
 import os
-import json
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 
 TOKEN = os.getenv('BOT_TOKEN')
 
-# Загружаем конфиг банков с абсолютным путем
-try:
-    # Пробуем разные возможные пути к файлу
-    possible_paths = [
-        'banks_config.json',
-        './banks_config.json',
-        '/app/banks_config.json'
-    ]
+# Проверяем что токен загружен
+if not TOKEN:
+    print("❌ ОШИБКА: BOT_TOKEN не найден в переменных окружения!")
+    print("❌ Проверьте что переменная BOT_TOKEN добавлена в Railway")
+    exit(1)
 
-    BANKS = {}
-    for path in possible_paths:
-        try:
-            with open(path, 'r', encoding='utf-8') as f:
-                BANKS = json.load(f)
-            print(f"✅ Файл banks_config.json успешно загружен по пути: {path}")
-            print(f"✅ Загружено банков: {len(BANKS)}")
-            break
-        except FileNotFoundError:
-            print(f"❌ Файл не найден по пути: {path}")
-            continue
-        except json.JSONDecodeError as e:
-            print(f"❌ Ошибка JSON в файле {path}: {e}")
-            continue
+print(f"✅ Токен бота загружен: {TOKEN[:10]}...")
 
-    if not BANKS:
-        print("❌ Не удалось загрузить файл banks_config.json ни по одному из путей!")
-        # Создаем заглушку для тестирования
-        BANKS = {
-            "Тестовый банк": {
-                "disclosure_url": "https://example.com",
-                "type": "html"
-            }
-        }
-        print("✅ Создана тестовая заглушка")
+# Данные банков прямо в коде
+BANKS = {
+    "Беларусбанк": {
+        "disclosure_url": "https://belarusbank.by/ru/33139/33151/33154/10560",
+        "type": "html"
+    },
+    "Белагропромбанк": {
+        "disclosure_url": "https://www.belapb.by/about/spravochnaya-informatsiya/normativy-bezopasnogo-funktsionirovaniya", 
+        "type": "html"
+    },
+    "Белинвестбанк": {
+        "disclosure_url": "https://www.belinvestbank.by/about-bank/finance-statistic",
+        "type": "pdf"
+    },
+    "Приорбанк": {
+        "disclosure_url": "https://www.priorbank.by/priorbank-main/business-information/bank-reporting/about-normativy-rezervy",
+        "type": "html"
+    },
+    "Сбер Банк": {
+        "disclosure_url": "https://www.sber-bank.by/standards-of-safe-functioning",
+        "type": "pdf"
+    },
+    "Альфа-Банк": {
+        "disclosure_url": "https://www.alfabank.by/about/reporting",
+        "type": "pdf"
+    },
+    "Белгазпромбанк": {
+        "disclosure_url": "https://belgazprombank.by/about/finansovie_pokazateli/vipolnenie_normativov_bezopasnogo_funkci",
+        "type": "pdf"
+    },
+    "Банк БелВЭБ": {
+        "disclosure_url": "https://www.belveb.by/standards",
+        "type": "pdf"
+    },
+    "БНБ-Банк": {
+        "disclosure_url": "https://bnb.by/o-nas/nashi-rezultaty/prudentsialnaya-otchetnost",
+        "type": "pdf"
+    }
+}
 
-except Exception as e:
-    print(f"❌ Критическая ошибка при загрузке файла: {e}")
-    BANKS = {}
+print(f"✅ Данные банков загружены напрямую в код")
+print(f"✅ Загружено банков: {len(BANKS)}")
 
 # Функция для создания клавиатуры
 def create_bank_keyboard():
