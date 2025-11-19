@@ -1,1 +1,1 @@
-worker: python scrape_regcap.py
+worker: python Capital_standars_bot.py
