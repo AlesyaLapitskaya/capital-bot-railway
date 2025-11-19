@@ -3,7 +3,7 @@ from telegram.ext import ApplicationBuilder, CommandHandler, MessageHandler, Con
 import json
 
 CHOOSE_BANK = 0
-TOKEN = '8410306872:AAHBR2Jy6xxD8ZlNz9x9KFGtXFFtTm5xhT0'
+TOKEN = os.getenv('BOT_TOKEN') 
 
 # Загружаем конфиг банков
 with open('banks_config.json', encoding='utf-8') as f:
@@ -50,4 +50,5 @@ def main():
    app.run_polling()
 
 if __name__ == '__main__':
+
    main()
