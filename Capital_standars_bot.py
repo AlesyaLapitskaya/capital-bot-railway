@@ -50,6 +50,13 @@ BANKS = {
         "disclosure_url": "https://bnb.by/o-nas/nashi-rezultaty/prudentsialnaya-otchetnost",
         "type": "pdf"
     }
+    "МТБанк": {
+        "disclosure_url": "https://www.mtbank.by/about/reporting/standards/",
+        "type": "pdf"
+    },
+    "Банк ВТБ": {
+        "disclosure_url": "https://www.vtb.by/o-banke/finansovaya-otchetnost/2025?type=6",
+        "type": "pdf"
 }
 
 print(f"✅ Данные банков загружены напрямую в код")
@@ -119,3 +126,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
