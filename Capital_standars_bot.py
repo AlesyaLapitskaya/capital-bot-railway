@@ -1,4 +1,5 @@
 import os
+import time
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 
@@ -11,7 +12,7 @@ if not TOKEN:
 
 print("✅ Bot token loaded")
 
-# Banks data
+# Все банки с полными ссылками
 BANKS = {
     "Беларусбанк": "https://belarusbank.by/ru/33139/33151/33154/10560",
     "Белагропромбанк": "https://www.belapb.by/about/spravochnaya-informatsiya/normativy-bezopasnogo-funktsionirovaniya",
@@ -26,6 +27,8 @@ BANKS = {
     "Банк ВТБ": "https://www.vtb.by/o-banke/finansovaya-otchetnost/2025?type=6"
 }
 
+print(f"✅ Загружено банков: {len(BANKS)}")
+
 def create_keyboard():
     keyboard = [[bank] for bank in BANKS.keys()]
     return ReplyKeyboardMarkup(keyboard, resize_keyboard=True, one_time_keyboard=True)
@@ -33,7 +36,8 @@ def create_keyboard():
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = create_keyboard()
     await update.message.reply_text(
-        "Привет! Выберите банк:",
+        "Привет! Я бот для поиска нормативного капитала банков Беларуси.\n"
+        "Выберите банк из списка ниже:",
         reply_markup=reply_markup
     )
     return CHOOSE_BANK
@@ -41,15 +45,20 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_choice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     bank = update.message.text
     if bank in BANKS:
-        await update.message.reply_text(f"Ссылка: {BANKS[bank]}")
+        await update.message.reply_text(f"Ссылка на нормативный капитал банка {bank}:\n{BANKS[bank]}")
     else:
-        await update.message.reply_text("Банк не найден")
+        await update.message.reply_text("Банк не найден. Выберите банк из списка.")
     
+    # Показываем клавиатуру снова для выбора следующего банка
     reply_markup = create_keyboard()
     await update.message.reply_text("Выберите следующий банк:", reply_markup=reply_markup)
     return CHOOSE_BANK
 
 def main():
+    # Задержка для избежания конфликтов
+    print("⏳ Starting bot with delay...")
+    time.sleep(5)
+    
     app = Application.builder().token(TOKEN).build()
     
     conv_handler = ConversationHandler(
@@ -59,7 +68,8 @@ def main():
     )
     
     app.add_handler(conv_handler)
-    print("🤖 Bot started!")
+    print("🤖 Бот запущен успешно!")
+    print(f"📊 Доступно банков: {len(BANKS)}")
     app.run_polling()
 
 if __name__ == '__main__':
