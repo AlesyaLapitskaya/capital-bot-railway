@@ -1,4 +1,5 @@
 import os
+import time
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 
@@ -53,6 +54,10 @@ async def handle_choice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return CHOOSE_BANK
 
 def main():
+    # Добавляем задержку чтобы избежать конфликтов
+    print("⏳ Запускаем бота с задержкой...")
+    time.sleep(10)
+    
     app = Application.builder().token(TOKEN).build()
     
     conv_handler = ConversationHandler(
@@ -62,16 +67,11 @@ def main():
     )
     
     app.add_handler(conv_handler)
-    print("🤖 Бот запущен с WEBHOOK!")
+    print("🤖 Бот запущен успешно!")
     print(f"📊 Доступно банков: {len(BANKS)}")
     
-    # ВАЖНО: Используем WEBHOOK вместо polling
-    PORT = int(os.environ.get('PORT', 10000))
-    app.run_webhook(
-        listen="0.0.0.0",
-        port=PORT,
-        webhook_url=None
-    )
+    # Используем обычный polling (проще и надежнее)
+    app.run_polling()
 
 if __name__ == '__main__':
     main()
