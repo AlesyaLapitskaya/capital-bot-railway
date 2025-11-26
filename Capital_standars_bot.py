@@ -1,6 +1,5 @@
 import os
 import time
-import sys
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 
@@ -9,7 +8,7 @@ TOKEN = os.getenv('BOT_TOKEN')
 
 if not TOKEN:
     print("❌ BOT_TOKEN not found!")
-    sys.exit(1)
+    exit(1)
 
 print("✅ Bot token loaded")
 
@@ -55,11 +54,11 @@ async def handle_choice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return CHOOSE_BANK
 
 def main():
-    # ОЧЕНЬ большая задержка
-    print("⏳ Запускаем бота с задержкой 120 секунд...")
-    time.sleep(120)
+    # Короткая задержка
+    print("⏳ Запускаем бота...")
+    time.sleep(5)
     
-    print("🔧 Создаем приложение...")
+    # ОСОБЫЕ НАСТРОЙКИ ДЛЯ RAILWAY
     app = Application.builder().token(TOKEN).build()
     
     conv_handler = ConversationHandler(
@@ -69,22 +68,17 @@ def main():
     )
     
     app.add_handler(conv_handler)
-    print("🤖 Бот запущен успешно!")
+    print("🤖 Бот запущен!")
     print(f"📊 Доступно банков: {len(BANKS)}")
     
-    # Запускаем с обработкой ошибок
-    try:
-        app.run_polling(
-            drop_pending_updates=True,
-            allowed_updates=['message', 'callback_query']
-        )
-    except Exception as e:
-        if "Conflict" in str(e):
-            print("❌ Обнаружен конфликт. Завершаем работу...")
-            sys.exit(0)  # Мирный выход
-        else:
-            print(f"❌ Другая ошибка: {e}")
-            raise
+    # ЗАПУСКАЕМ С ОСОБЫМИ ПАРАМЕТРАМИ
+    app.run_polling(
+        drop_pending_updates=True,
+        allowed_updates=['message'],
+        pool_timeout=10,
+        connect_timeout=10,
+        read_timeout=10
+    )
 
 if __name__ == '__main__':
     main()
