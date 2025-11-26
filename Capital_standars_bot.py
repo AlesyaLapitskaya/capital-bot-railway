@@ -1,5 +1,6 @@
 import os
 import time
+import sys
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 
@@ -8,7 +9,7 @@ TOKEN = os.getenv('BOT_TOKEN')
 
 if not TOKEN:
     print("❌ BOT_TOKEN not found!")
-    exit(1)
+    sys.exit(1)
 
 print("✅ Bot token loaded")
 
@@ -54,24 +55,29 @@ async def handle_choice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return CHOOSE_BANK
 
 def main():
-    # Добавляем задержку чтобы избежать конфликтов
-    print("⏳ Запускаем бота с задержкой...")
-    time.sleep(10)
+    # Большая задержка и принудительный выход при конфликте
+    print("⏳ Запускаем бота с задержкой 60 секунд...")
+    time.sleep(60)
     
-    app = Application.builder().token(TOKEN).build()
-    
-    conv_handler = ConversationHandler(
-        entry_points=[CommandHandler('start', start)],
-        states={CHOOSE_BANK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_choice)]},
-        fallbacks=[]
-    )
-    
-    app.add_handler(conv_handler)
-    print("🤖 Бот запущен успешно!")
-    print(f"📊 Доступно банков: {len(BANKS)}")
-    
-    # Используем обычный polling (проще и надежнее)
-    app.run_polling()
+    try:
+        app = Application.builder().token(TOKEN).build()
+        
+        conv_handler = ConversationHandler(
+            entry_points=[CommandHandler('start', start)],
+            states={CHOOSE_BANK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_choice)]},
+            fallbacks=[]
+        )
+        
+        app.add_handler(conv_handler)
+        print("🤖 Бот запущен успешно!")
+        print(f"📊 Доступно банков: {len(BANKS)}")
+        app.run_polling()
+    except Exception as e:
+        if "Conflict" in str(e):
+            print("❌ Обнаружен конфликт. Принудительно завершаем работу...")
+            sys.exit(1)
+        else:
+            raise e
 
 if __name__ == '__main__':
     main()
