@@ -55,29 +55,36 @@ async def handle_choice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return CHOOSE_BANK
 
 def main():
-    # Большая задержка и принудительный выход при конфликте
-    print("⏳ Запускаем бота с задержкой 60 секунд...")
-    time.sleep(60)
+    # ОЧЕНЬ большая задержка
+    print("⏳ Запускаем бота с задержкой 120 секунд...")
+    time.sleep(120)
     
+    print("🔧 Создаем приложение...")
+    app = Application.builder().token(TOKEN).build()
+    
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('start', start)],
+        states={CHOOSE_BANK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_choice)]},
+        fallbacks=[]
+    )
+    
+    app.add_handler(conv_handler)
+    print("🤖 Бот запущен успешно!")
+    print(f"📊 Доступно банков: {len(BANKS)}")
+    
+    # Запускаем с обработкой ошибок
     try:
-        app = Application.builder().token(TOKEN).build()
-        
-        conv_handler = ConversationHandler(
-            entry_points=[CommandHandler('start', start)],
-            states={CHOOSE_BANK: [MessageHandler(filters.TEXT & ~filters.COMMAND, handle_choice)]},
-            fallbacks=[]
+        app.run_polling(
+            drop_pending_updates=True,
+            allowed_updates=['message', 'callback_query']
         )
-        
-        app.add_handler(conv_handler)
-        print("🤖 Бот запущен успешно!")
-        print(f"📊 Доступно банков: {len(BANKS)}")
-        app.run_polling()
     except Exception as e:
         if "Conflict" in str(e):
-            print("❌ Обнаружен конфликт. Принудительно завершаем работу...")
-            sys.exit(1)
+            print("❌ Обнаружен конфликт. Завершаем работу...")
+            sys.exit(0)  # Мирный выход
         else:
-            raise e
+            print(f"❌ Другая ошибка: {e}")
+            raise
 
 if __name__ == '__main__':
     main()
