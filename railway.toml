@@ -1,5 +1,8 @@
 [deploy]
 numReplicas = 1
+autoRollback = false
 
 [service]
 numReplicas = 1
+softConcurrency = 1
+hardConcurrency = 1
