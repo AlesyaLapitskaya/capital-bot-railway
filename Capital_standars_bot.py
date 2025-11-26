@@ -1,5 +1,4 @@
 import os
-import time
 from telegram import Update, ReplyKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, ConversationHandler
 
@@ -12,7 +11,7 @@ if not TOKEN:
 
 print("✅ Bot token loaded")
 
-# Все банки с полными ссылками
+# ВСЕ 11 БАНКОВ
 BANKS = {
     "Беларусбанк": "https://belarusbank.by/ru/33139/33151/33154/10560",
     "Белагропромбанк": "https://www.belapb.by/about/spravochnaya-informatsiya/normativy-bezopasnogo-funktsionirovaniya",
@@ -49,16 +48,11 @@ async def handle_choice(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text("Банк не найден. Выберите банк из списка.")
     
-    # Показываем клавиатуру снова для выбора следующего банка
     reply_markup = create_keyboard()
     await update.message.reply_text("Выберите следующий банк:", reply_markup=reply_markup)
     return CHOOSE_BANK
 
 def main():
-    # Задержка для избежания конфликтов
-    print("⏳ Starting bot with delay...")
-    time.sleep(5)
-    
     app = Application.builder().token(TOKEN).build()
     
     conv_handler = ConversationHandler(
@@ -68,9 +62,16 @@ def main():
     )
     
     app.add_handler(conv_handler)
-    print("🤖 Бот запущен успешно!")
+    print("🤖 Бот запущен с WEBHOOK!")
     print(f"📊 Доступно банков: {len(BANKS)}")
-    app.run_polling()
+    
+    # ВАЖНО: Используем WEBHOOK вместо polling
+    PORT = int(os.environ.get('PORT', 10000))
+    app.run_webhook(
+        listen="0.0.0.0",
+        port=PORT,
+        webhook_url=None
+    )
 
 if __name__ == '__main__':
     main()
